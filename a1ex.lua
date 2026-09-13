@@ -90,7 +90,10 @@ for k, v in pairs(cfg.arguments or {}) do
 	session:setArgument(k, v);
 end
 
+io.stdout:write("> ");
+io.stdout:flush();
 for line in io.lines() do
+
 	local req = session:generateRequest(line);
 	local written;
 	local readf = function()
@@ -126,8 +129,11 @@ for line in io.lines() do
 	end
 
 	if msg.reasoningContent then
-		print(msg.reasoningContent);
+		print("[REASONING] " .. msg.reasoningContent);
 	end
 
-	print(msg.content);
+	print("[ASSISTANT] " .. msg.content);
+
+	io.stdout:write("> ");
+	io.stdout:flush();
 end
