@@ -12,6 +12,7 @@ local table		= require "table";
 
 local mCURL		= require "cURL";
 
+local mHttp		= require "a1ex.http";
 local mSession		= require "a1ex.session";
 
 local function
@@ -71,19 +72,11 @@ parseConfiguration()
 end
 
 local cfg = parseConfiguration();
-local connection = mCURL.easy{
-				url			= cfg.endpoint,
-				httpheader		= {
-					"Content-type: application/json",
-					("Authorization: Bearer %s"):
-					format(cfg.apiKey),
-				},
-				[mCURL.OPT_POST]	= true,
-			     };
-
-if os.getenv("DEBUG_CURL_REQUEST") then
-	connection:setopt(mCURL.OPT_VERBOSE, true);
-end
+local connection = mHttp.connection(cfg.endpoint, {
+	"Content-type: application/json",
+	("Authorization: Bearer %s"):format(cfg.apiKey),
+	"User-agent: a1ex",
+});
 
 local session = mSession.session();
 for k, v in pairs(cfg.arguments or {}) do
@@ -93,32 +86,14 @@ end
 io.stdout:write("> ");
 io.stdout:flush();
 for line in io.lines() do
-
 	local req = session:generateRequest(line);
-	local written;
-	local readf = function()
-		if not written then
-			written = true;
-			return req;
-		end
-	end;
-	connection:setopt_readfunction(readf);
 
-	local repBuf = {};
-	local writef = function(t)
-		table.insert(repBuf, t);
-		return true;
-	end
-	connection:setopt_writefunction(writef);
-
-	local ok, err = pcall(connection.perform, connection);
+	local ok, statusCode, rep = connection:request(req);
 	if not ok then
-		perror("Failed to request the server: %s", ret);
+		perror("Failed to request the server: %s", rep);
 	end
 
-	local rep = table.concat(repBuf);
-	local errcode = connection:getinfo(mCURL.INFO_RESPONSE_CODE);
-	if errcode ~= 200 then
+	if statusCode ~= 200 then
 		perror("Server responds with error code %d: %s",
 		       errcode, rep);
 	end
