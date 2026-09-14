@@ -97,13 +97,17 @@ end
 local finishReason, msg = "stop";
 while true do
 	if finishReason == "stop" then
-		io.stdout:write("> ");
-		io.stdout:flush();
+		local line;
 
-		local line = io.stdin:read("l");
-		if not line then
-			goto exit;
-		end
+		repeat
+			io.stdout:write("> ");
+			io.stdout:flush();
+
+			line = io.stdin:read("l");
+			if not line then
+				goto exit;
+			end
+		until line ~= "";
 
 		session:appendUser(line);
 	elseif finishReason == "tool_calls" then
