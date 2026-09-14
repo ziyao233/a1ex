@@ -14,6 +14,7 @@ local mCURL		= require "cURL";
 
 local mHttp		= require "a1ex.http";
 local mSession		= require "a1ex.session";
+local mTools		= require "a1ex.tools";
 
 local function
 perror(fmt, ...)
@@ -68,6 +69,10 @@ parseConfiguration()
 		cfg.arguments = checkCfg(ret, "arguments", "table");
 	end
 
+	if ret.prompt then
+		cfg.prompt = checkCfg(ret, "prompt", "string");
+	end
+
 	return cfg;
 end
 
@@ -83,11 +88,34 @@ for k, v in pairs(cfg.arguments or {}) do
 	session:setArgument(k, v);
 end
 
-io.stdout:write("> ");
-io.stdout:flush();
-for line in io.lines() do
-	local req = session:generateRequest(line);
+session:registerTools(mTools.definitions);
 
+if cfg.prompt then
+	session:setSystemPrompt(cfg.prompt);
+end
+
+local finishReason, msg = "stop";
+while true do
+	if finishReason == "stop" then
+		io.stdout:write("> ");
+		io.stdout:flush();
+
+		local line = io.stdin:read("l");
+		if not line then
+			goto exit;
+		end
+
+		session:appendUser(line);
+	elseif finishReason == "tool_calls" then
+		for _, call in ipairs(msg.toolCalls) do
+			session:appendTool(call.id,
+					   mTools.process(call));
+		end
+	else
+		perror("Invalid finish reason %s", finishReason);
+	end
+
+	local req = session:generateRequest();
 	local ok, statusCode, rep = connection:request(req);
 	if not ok then
 		perror("Failed to request the server: %s", rep);
@@ -95,20 +123,22 @@ for line in io.lines() do
 
 	if statusCode ~= 200 then
 		perror("Server responds with error code %d: %s",
-		       errcode, rep);
+		       statusCode, rep);
 	end
 
-	local msg, err = session:parseResponse(rep);
+	local err;
+	msg, finishReason = session:parseResponse(rep);
 	if not msg then
-		perror("Failed to parse server response: %s", err);
+		perror("Failed to parse server response: %s", finishReason);
 	end
 
-	if msg.reasoningContent then
+	if msg.reasoningContent and msg.reasoningContent ~= "" then
 		print("[REASONING] " .. msg.reasoningContent);
 	end
 
-	print("[ASSISTANT] " .. msg.content);
-
-	io.stdout:write("> ");
-	io.stdout:flush();
+	if msg.content and msg.content ~= "" then
+		print("[ASSISTANT] " .. msg.content);
+	end
 end
+
+::exit::

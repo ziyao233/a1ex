@@ -5,12 +5,20 @@
 --	Copyright (C) 2026 Yao Zi <me@ziyao.cc>
 --]]
 
+local os		= require "os";
 local table		= require "table";
 
 local mCURL		= require "cURL";
 
 local metaConnection = {};
 metaConnection.__index = metaConnection;
+
+local debugPrint;
+if os.getenv("DEBUG_HTTP") then
+	debugPrint = print;
+else
+	debugPrint = function() end;
+end
 
 local function
 writeFunction(self, data)
@@ -43,6 +51,7 @@ metaConnection.request(self, body)
 
 	self.buf = {};
 
+	debugPrint(body);
 	local ok, err = pcall(self.handle.perform, self.handle);
 	if not ok then
 		return false, 0, err;
@@ -50,6 +59,7 @@ metaConnection.request(self, body)
 
 	local statusCode = self.handle:getinfo(mCURL.INFO_RESPONSE_CODE);
 	local response = table.concat(self.buf);
+	debugPrint(response);
 
 	-- Close the reference so the buffer could be collected as soon as
 	-- possible.
