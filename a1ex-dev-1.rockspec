@@ -25,7 +25,6 @@ build = {
 		["a1ex.session"]	= "a1ex/session.lua",
 		["a1ex.tools"]		= "a1ex/tools.lua",
 		["a1ex.tools.bash"]	= "a1ex/tools/bash.lua",
-		["a1ex.tools.read"]	= "a1ex/tools/read.lua",
 		["a1ex.tools.write"]	= "a1ex/tools/write.lua",
 	}
 }

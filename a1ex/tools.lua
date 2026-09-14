@@ -11,7 +11,7 @@ local table		= require "table";
 local mCjson		= require "cjson";
 
 local toolNames = {
-	"read", "bash", "write",
+	"bash", "write",
 };
 
 local definitions, tools = {}, {};
