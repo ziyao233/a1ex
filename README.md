@@ -2,6 +2,18 @@
 
 A simple (and likely poor) LLM coding agent in Lua.
 
+## Security Warning
+
+This project implements no sandboxing or approval mechanisms for tool calls.
+Since LLM agents are effectively RCEs, please isolate them in separate
+containers or VMs.
+
+Technically, any agents, hacked by prompts from untrusted sources, could steal
+your API keys and consume your other valuable resources. The best solution is
+forwarding your requests through a local API gateway to prevent unwelcomed guys
+from accessing with your LLM API key at first, and do not provide valuable keys
+or tokens to your agent :)
+
 ## Usage
 
 You should be able to install it with luarocks, or invoke it directly through
