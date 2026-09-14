@@ -49,6 +49,15 @@ metaSession.registerTools(self, definitions)
 end
 
 local function
+nullable(value)
+	if value == mCjson.null then
+		return nil;
+	end
+
+	return value;
+end
+
+local function
 parseMessage(self, rawMsg)
 	local role = rawMsg.role;
 
@@ -60,12 +69,14 @@ parseMessage(self, rawMsg)
 		return false, "invalid role in reply";
 	end
 
-	if type(rawMsg.content) ~= "string" then
+	if type(rawMsg.content) ~= "string" and
+	   rawMsg.content ~= mCjson.null and
+	   rawMsg.content ~= nil then
 		return false, "missing content in reply or it's in wrong type";
 	end
 
 	local toolCalls;
-	if rawMsg.tool_calls then
+	if rawMsg.tool_calls and rawMsg.tool_calls ~= mCjson.null then
 		if type(rawMsg.tool_calls) ~= "table" then
 			return false, "invalid type for tool_calls";
 		end
@@ -105,8 +116,8 @@ parseMessage(self, rawMsg)
 
 	local msg = {
 			role			= role,
-			content 		= rawMsg.content,
-			reasoningContent	= rawMsg.reasoning_content,
+			content 		= nullable(rawMsg.content),
+			reasoningContent	= nullable(rawMsg.reasoning_content),
 			toolCalls		= toolCalls,
 		    };
 	self:appendMessage(msg);
