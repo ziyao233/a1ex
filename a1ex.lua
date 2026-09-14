@@ -142,3 +142,5 @@ while true do
 end
 
 ::exit::
+
+io.stdout:write('\n');
