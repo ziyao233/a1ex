@@ -11,6 +11,7 @@ dependencies = {
 	"lua >= 5.4",
 	"Lua-cURL >= 0.3.0",
 	"luaposix",
+	"lua-cjson"
 }
 build = {
 	type = "builtin",
