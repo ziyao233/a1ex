@@ -8,9 +8,6 @@
 
 local io		= require "io";
 local os		= require "os";
-local table		= require "table";
-
-local mCURL		= require "cURL";
 
 local mHttp		= require "a1ex.http";
 local mSession		= require "a1ex.session";
