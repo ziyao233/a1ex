@@ -43,8 +43,6 @@ end
 
 function
 metaConnection.request(self, body)
-	assert(body);
-
 	if body then
 		self.handle:setopt(mCURL.OPT_POSTFIELDS, body);
 	end
