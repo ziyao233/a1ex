@@ -24,8 +24,8 @@ You should be able to install it with luarocks, or invoke it directly through
 - `lua-CURLv3`
 - `lua-cjson`
 
-It executes `$HOME/.config/a1ex.lua` on start, and retrieves configuration from
-its return value. a1ex expects a table, and recognizes following fields,
+It executes `$HOME/.config/a1ex/a1ex.lua` on start, and retrieves configuration
+from its return value. a1ex expects a table, and recognizes following fields,
 
 - `endpoint`: string, OpenAI-completion-style API endpoint
 - `apiKey`: string, literally authentication key
