@@ -23,6 +23,9 @@ You should be able to install it with luarocks, or invoke it directly through
 - `luaposix`
 - `lua-CURLv3`
 - `lua-cjson`
+- `cffi-lua`
+  - For better interaction experience, readline shouldbe installed. This isn't
+    a hard dependency though.
 
 It executes `$HOME/.config/a1ex/a1ex.lua` on start, and retrieves configuration
 from its return value. a1ex expects a table, and recognizes following fields,

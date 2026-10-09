@@ -11,7 +11,8 @@ dependencies = {
 	"lua >= 5.4",
 	"Lua-cURL >= 0.3.0",
 	"luaposix",
-	"lua-cjson"
+	"lua-cjson",
+	"cffi-lua"
 }
 build = {
 	type = "builtin",
@@ -22,6 +23,7 @@ build = {
 	},
 	modules = {
 		["a1ex.http"]		= "a1ex/http.lua",
+		["a1ex.interaction"]	= "a1ex/interaction.lua",
 		["a1ex.session"]	= "a1ex/session.lua",
 		["a1ex.tools"]		= "a1ex/tools.lua",
 		["a1ex.tools.bash"]	= "a1ex/tools/bash.lua",

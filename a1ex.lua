@@ -10,6 +10,7 @@ local io		= require "io";
 local os		= require "os";
 
 local mHttp		= require "a1ex.http";
+local mInteraction	= require "a1ex.interaction";
 local mSession		= require "a1ex.session";
 local mTools		= require "a1ex.tools";
 
@@ -91,20 +92,15 @@ if cfg.prompt then
 	session:setSystemPrompt(cfg.prompt);
 end
 
+mInteraction.init();
+
 local finishReason, msg = "stop";
 while true do
 	if finishReason == "stop" then
-		local line;
-
-		repeat
-			io.stdout:write("> ");
-			io.stdout:flush();
-
-			line = io.stdin:read("l");
-			if not line then
-				goto exit;
-			end
-		until line ~= "";
+		local line = mInteraction.readline();
+		if not line then
+			goto exit;
+		end
 
 		session:appendUser(line);
 	elseif finishReason == "tool_calls" then
