@@ -27,7 +27,9 @@ local parameters = {
 		timeout = {
 			type		= "integer",
 			default		= 300,
-			description	= "Timeout in seconds, zero to disable"
+			description	= "Timeout in seconds before " ..
+					  "killing the process and " ..
+					  "returning, zero to disable"
 		},
 	},
 	required = { "command" },
