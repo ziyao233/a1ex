@@ -35,6 +35,8 @@ connection(url, headers)
 		},
 	};
 
+	obj.handle:setopt(mCURL.OPT_FOLLOWLOCATION, true);
+
 	obj.handle:setopt_writefunction(writeFunction, obj);
 
 	return setmetatable(obj, metaConnection);
