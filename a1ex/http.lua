@@ -9,6 +9,7 @@ local os		= require "os";
 local table		= require "table";
 
 local mCURL		= require "cURL";
+local mUnistd		= require "posix.unistd";
 
 local metaConnection = {};
 metaConnection.__index = metaConnection;
@@ -66,6 +67,36 @@ metaConnection.request(self, body)
 	self.buf = nil;
 
 	return true, statusCode, response;
+end
+
+local function
+suitableForRetry(code)
+	return code == 408 or code == 429 or
+	       ((code >= 500 and code < 600) and code ~= 501);
+end
+
+function
+metaConnection.requestWithRetry(self, body, attempts, delay, onRetry)
+	onRetry = onRetry or function() end;
+
+	local ok, statusCode, rep;
+	local count = 0;
+	repeat
+		if count ~= 0 then
+			onRetry(count, statusCode, rep);
+			mUnistd.sleep(delay);
+			delay = delay * 2;
+		end
+
+		ok, statusCode, rep = self:request(body);
+		if ok and not suitableForRetry(statusCode) then
+			break;
+		end
+
+		count = count + 1;
+	until count >= attempts;
+
+	return ok, statusCode, rep;
 end
 
 return {
