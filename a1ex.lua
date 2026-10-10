@@ -15,8 +15,13 @@ local mSession		= require "a1ex.session";
 local mTools		= require "a1ex.tools";
 
 local function
-perror(fmt, ...)
+pwarn(fmt, ...)
 	io.stderr:write((fmt .. "\n"):format(...));
+end
+
+local function
+perror(fmt, ...)
+	pwarn(fmt, ...);
 	os.exit(1);
 end
 
@@ -113,7 +118,12 @@ while true do
 	end
 
 	local req = session:generateRequest();
-	local ok, statusCode, rep = connection:request(req);
+	local ok, statusCode, rep = connection:requestWithRetry(req, 5, 5,
+				    function(count, statusCode, rep)
+					pwarn("Server responds with error code %d: %s",
+					      statusCode, rep);
+					pwarn("Retrying (count %d)", count);
+				    end);
 	if not ok then
 		perror("Failed to request the server: %s", rep);
 	end
