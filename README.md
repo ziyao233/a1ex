@@ -33,6 +33,16 @@ from its return value. a1ex expects a table, and recognizes following fields,
 - `endpoint`: string, OpenAI-completion-style API endpoint
 - `apiKey`: string, literally authentication key
 - `hideReasoning`: boolean, whether to hide reasoning content
+- `pretty`: function, pretty printer to customize output style, its prototype
+	    should look like `function pretty(what, content)`, and should return
+	    the stylized content (e.g., with terminal escaping sequence applied)
+  - `what` represents type of the content, and currently the following values
+    are defined,
+    - "assistant": Assistant replies
+    - "reasoning": Assistant reasoning content
+    - "tool": Tool call invocation
+    - "info": System information (token usage, etc.)
+    - "warning": System warnings (network traffic issues, etc.)
 - `arguments`, table, should contain JSON-respresentable simple values
 	       (number, string, boolean, etc.) only. They would be copied to
 	       requests sent to servers as-is.

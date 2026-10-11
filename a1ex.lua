@@ -80,6 +80,10 @@ parseConfiguration()
 		cfg.hideReasoning = checkCfg(ret, "hideReasoning", "boolean");
 	end
 
+	if ret.pretty then
+		cfg.pretty = checkCfg(ret, "pretty", "function");
+	end
+
 	return cfg;
 end
 
@@ -146,6 +150,10 @@ if cfg.prompt then
 end
 
 mInteraction.init();
+
+if cfg.pretty then
+	mInteraction.setPretty(cfg.pretty);
+end
 
 local function
 onRetry(count, statusCode, rep)
