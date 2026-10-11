@@ -24,7 +24,7 @@ You should be able to install it with luarocks, or invoke it directly through
 - `lua-CURLv3`
 - `lua-cjson`
 - `cffi-lua`
-  - For better interaction experience, readline shouldbe installed. This isn't
+  - For better interaction experience, readline should be installed. This isn't
     a hard dependency though.
 
 It executes `$HOME/.config/a1ex/a1ex.lua` on start, and retrieves configuration
