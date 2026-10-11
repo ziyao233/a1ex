@@ -147,6 +147,13 @@ end
 
 mInteraction.init();
 
+local function
+onRetry(count, statusCode, rep)
+	mInteraction.pretty("warning", ("Server responds with error code %d: %s"):
+				       format(statusCode, rep));
+	mInteraction.pretty("warning", ("Retrying (count %d)"):format(count));
+end
+
 local finishReason, msg = "stop";
 while true do
 	if finishReason == "stop" then
@@ -167,11 +174,7 @@ while true do
 
 	local req = session:generateRequest();
 	local ok, statusCode, rep = connection:requestWithRetry(req, 5, 5,
-				    function(count, statusCode, rep)
-					pwarn("Server responds with error code %d: %s",
-					      statusCode, rep);
-					pwarn("Retrying (count %d)", count);
-				    end);
+				    onRetry);
 	if not ok then
 		perror("Failed to request the server: %s", rep);
 	end
@@ -189,11 +192,11 @@ while true do
 
 	if msg.reasoningContent and msg.reasoningContent ~= "" and
 	   not cfg.hideReasoning then
-		print("[REASONING] " .. msg.reasoningContent);
+		mInteraction.pretty("reasoning", msg.reasoningContent);
 	end
 
 	if msg.content and msg.content ~= "" then
-		print("[ASSISTANT] " .. msg.content);
+		mInteraction.pretty("assistant", msg.content);
 	end
 end
 

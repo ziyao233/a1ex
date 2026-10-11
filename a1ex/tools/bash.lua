@@ -14,6 +14,7 @@ local mStdio		= require "posix.stdio";
 local mUnistd		= require "posix.unistd";
 local mWait		= require "posix.sys.wait";
 
+local mInteraction	= require "a1ex.interaction";
 
 --[[ TODO: Support command timeout ]]
 local parameters = {
@@ -154,8 +155,8 @@ process(arg)
 		end
 	end
 
-	print(("[TOOL] Executing '%s' with timeout %d"):
-	      format(command, timeout));
+	mInteraction.pretty("tool", ("Executing '%s' with timeout %d"):
+				    format(command, timeout));
 
 	return runWithTimeout(command, timeout);
 end

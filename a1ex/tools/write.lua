@@ -7,6 +7,8 @@
 
 local io		= require "io";
 
+local mInteraction	= require "a1ex.interaction";
+
 local parameters = {
 	type		= "object",
 	properties	= {
@@ -55,7 +57,7 @@ process(arg)
 		return "Wrong type for 'content' argument, expect string";
 	end
 
-	print(("[TOOL] Writing '%s'"):format(path));
+	mInteraction.pretty("tool", ("Writing '%s'"):format(path));
 
 	local file <close>, msg = io.open(path, "wb");
 	if not file then

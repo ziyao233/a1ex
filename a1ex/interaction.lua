@@ -105,7 +105,40 @@ readline()
 	return line;
 end
 
+--[[
+--	Currently what is defined to include
+--	- "assistant": Assistant replies
+--	- "reasoning": Assistant reasoning content
+--	- "tool": Tool call invocation
+--	- "info": System information (token usage, etc.)
+--	- "warning": System warnings (network traffic issues, etc.)
+--]]
+local function
+doPretty(what, content)
+	if what == "assistant" then
+		content = "[ASSISTANT] " .. content;
+	elseif what == "reasoning" then
+		content = "[REASONING] " .. content;
+	elseif what == "tool" then
+		content = "[TOOL] " .. content;
+	end
+
+	return content;
+end
+
+local function
+pretty(what, content)
+	print(doPretty(what, content));
+end
+
+local function
+setPretty(f)
+	doPretty = f;
+end
+
 return {
 	init		= init,
 	readline	= readline,
+	pretty		= pretty,
+	setPretty	= setPretty,
 };
