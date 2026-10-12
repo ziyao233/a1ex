@@ -76,10 +76,58 @@ parseConfiguration()
 		cfg.prompt = checkCfg(ret, "prompt", "string");
 	end
 
+	if ret.hideReasoning then
+		cfg.hideReasoning = checkCfg(ret, "hideReasoning", "boolean");
+	end
+
 	return cfg;
 end
 
+local function
+printHelp(arg0)
+	io.stderr:write(([[
+Usage: %s [options]
+
+Options:
+	--help			Print this help
+	--hide-reasoning
+	--display-reasoning	Display reasoning content or not, overrides
+				hideReasoning in configuration
+]]):format(arg0));
+end
+
+local function
+parseArguments(arg)
+	local cfg = {};
+
+	local i = 1;
+	while i <= #arg do
+		if arg[i] == "--hide-reasoning" then
+			cfg.hideReasoning = true;
+		elseif arg[i] == "--display-reasoning" then
+			cfg.hideReasoning = false;
+		elseif arg[i] == "--help" then
+			printHelp(arg[0]);
+			os.exit(0);
+		else
+			pwarn("Unrecognized option %s", arg[i]);
+			printHelp(arg[0]);
+			os.exit(1);
+		end
+
+		i = i + 1;
+	end
+
+	return cfg;
+end
+
+local cfgArgs = parseArguments(arg);
 local cfg = parseConfiguration();
+
+for k, v in pairs(cfgArgs) do
+	cfg[k] = v;
+end
+
 local connection = mHttp.connection(cfg.endpoint, {
 	"Content-type: application/json",
 	("Authorization: Bearer %s"):format(cfg.apiKey),
@@ -139,7 +187,8 @@ while true do
 		perror("Failed to parse server response: %s", finishReason);
 	end
 
-	if msg.reasoningContent and msg.reasoningContent ~= "" then
+	if msg.reasoningContent and msg.reasoningContent ~= "" and
+	   not cfg.hideReasoning then
 		print("[REASONING] " .. msg.reasoningContent);
 	end
 

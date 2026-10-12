@@ -32,9 +32,13 @@ from its return value. a1ex expects a table, and recognizes following fields,
 
 - `endpoint`: string, OpenAI-completion-style API endpoint
 - `apiKey`: string, literally authentication key
+- `hideReasoning`: boolean, whether to hide reasoning content
 - `arguments`, table, should contain JSON-respresentable simple values
 	       (number, string, boolean, etc.) only. They would be copied to
 	       requests sent to servers as-is.
+
+The description of command line arguments could be obtained by invoking a1ex
+with `--help`.
 
 ## License and Code Origin
 
