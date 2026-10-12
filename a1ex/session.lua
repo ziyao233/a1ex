@@ -5,7 +5,15 @@
 --	Copyright (C) 2026 Yao Zi <me@ziyao.cc>
 --]]
 
+local math			= require "math";
+
 local mCjson			= require "cjson";
+
+--[[
+-- I definitely missed a lot of type guards in this totally handwritten parser,
+-- before implementing Response API or anything complicated, we should have a
+-- generic schema-based verifier. For simplicity, let's ignore some checks.
+--]]
 
 local metaSession = {};
 metaSession.__index = metaSession;
@@ -125,6 +133,48 @@ parseMessage(self, rawMsg)
 	return msg;
 end
 
+local function
+isInteger(x)
+	return type(x) == "number" and math.tointeger(x);
+end
+
+local function
+parseUsage(self, usage)
+	local completion = usage.completion_tokens;
+	if not isInteger(completion) then
+		return false, "invalid/missing completion_tokens";
+	end
+
+	local prompt = usage.prompt_tokens;
+	if not isInteger(prompt) then
+		return false, "invalid/missing prompt_tokens";
+	end
+
+	local promptDetails = usage.prompt_tokens_details;
+	if promptDetails then
+		if type(promptDetails) ~= "table" then
+			return false, "invalid type for prompt_tokens_details";
+		end
+
+		local cached = nullable(promptDetails.cached_tokens);
+		-- OpenAI's schema mandates cached_tokens when
+		-- prompt_tokens_details, but it's said that there're 3rd-party
+		-- implementations violating this.
+		if cached then
+			if not isInteger(cached) then
+				return false, "invalid type for cached_tokens";
+			end
+
+			self.cachedTokens = (self.cachedTokens or 0) + cached;
+		end
+	end
+
+	self.compTokens = (self.compTokens or 0) + completion;
+	self.promptTokens = (self.promptTokens or 0) + prompt;
+
+	return true;
+end
+
 function
 metaSession.parseResponse(self, rawResponse)
 	local invalidResponse = function(reason)
@@ -154,6 +204,18 @@ metaSession.parseResponse(self, rawResponse)
 	local msg, err = parseMessage(self, response.choices[1].message);
 	if not msg then
 		return invalidResponse(err);
+	end
+
+	local usage = nullable(response.usage);
+	if usage then
+		if type(usage) ~= "table" then
+			return invalidResponse "invalid usage";
+		end
+
+		local ok, err = parseUsage(self, usage);
+		if not ok then
+			return invalidResponse(err);
+		end
 	end
 
 	return msg, finishReason;
