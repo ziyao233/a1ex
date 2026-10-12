@@ -160,10 +160,11 @@ if cfg.pretty then
 end
 
 local function
-onRetry(count, statusCode, rep)
+onRetry(count, statusCode, rep, delay)
 	mInteraction.pretty("warning", ("Server responds with error code %d: %s"):
 				       format(statusCode, rep));
-	mInteraction.pretty("warning", ("Retrying (count %d)"):format(count));
+	mInteraction.pretty("warning", ("Retrying after %ds (count %d)"):
+				       format(delay, count));
 end
 
 local function
