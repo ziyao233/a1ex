@@ -97,6 +97,8 @@ Options:
 	--hide-reasoning
 	--display-reasoning	Display reasoning content or not, overrides
 				hideReasoning in configuration
+	--detailed-usage	Show cumulative usage among each turn of
+				API calls
 ]]):format(arg0));
 end
 
@@ -110,6 +112,8 @@ parseArguments(arg)
 			cfg.hideReasoning = true;
 		elseif arg[i] == "--display-reasoning" then
 			cfg.hideReasoning = false;
+		elseif arg[i] == "--detailed-usage" then
+			cfg.detailedUsage = true;
 		elseif arg[i] == "--help" then
 			printHelp(arg[0]);
 			os.exit(0);
@@ -162,6 +166,28 @@ onRetry(count, statusCode, rep)
 	mInteraction.pretty("warning", ("Retrying (count %d)"):format(count));
 end
 
+local function
+showUsage(session)
+	if not session.compTokens then
+		mInteraction.pretty("info", "Session usage unavailable");
+		return;
+	end
+
+	local cacheInfo = "";
+	if session.promptTokens ~= 0 and session.cachedTokens then
+		local rate = session.cachedTokens * 100 /
+			     session.promptTokens;
+		cacheInfo = (" (%d cached, %.1f%%)"):
+			    format(session.cachedTokens, rate);
+	end
+
+	local total = session.promptTokens + session.compTokens;
+	mInteraction.pretty("info",
+			    ("Session usage: %d input%s, %d output, %d in total"):
+			    format(session.promptTokens, cacheInfo,
+			    	   session.compTokens, total));
+end
+
 local finishReason, msg = "stop";
 while true do
 	if finishReason == "stop" then
@@ -206,8 +232,15 @@ while true do
 	if msg.content and msg.content ~= "" then
 		mInteraction.pretty("assistant", msg.content);
 	end
+
+	if cfg.detailedUsage then
+		showUsage(session);
+	end
 end
 
 ::exit::
 
+if not cfg.detailedUsage then
+	showUsage(session);
+end
 io.stdout:write('\n');
