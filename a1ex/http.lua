@@ -83,14 +83,14 @@ metaConnection.requestWithRetry(self, body, attempts, delay, onRetry)
 	local count = 0;
 	repeat
 		if count ~= 0 then
-			onRetry(count, statusCode, rep);
-
 			local retryAfter = self.handle:getinfo(mCURL.INFO_RETRY_AFTER);
 			if retryAfter > 0 then
 				debugPrint(("Resetting retry delay to %d"):
 					   format(retryAfter));
 				delay = retryAfter;
 			end
+
+			onRetry(count, statusCode, rep, delay);
 
 			mUnistd.sleep(delay);
 			delay = delay * 2;
