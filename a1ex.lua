@@ -243,4 +243,3 @@ end
 if not cfg.detailedUsage then
 	showUsage(session);
 end
-io.stdout:write('\n');

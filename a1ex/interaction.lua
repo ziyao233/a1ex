@@ -49,7 +49,12 @@ init()
 				io.stdout:flush();
 			end
 
-			return io.stdin:read("l");
+			local line = io.stdin:read("l");
+			if isTerm and not line then
+				io.stdout:write("\n");
+			end
+
+			return line;
 		end;
 	else
 		mCffi.cdef([[
